@@ -1,6 +1,5 @@
 import axios from 'axios';
 import React, { Component } from 'react';
-import { Redirect } from 'react-router-dom';
 
 import { url } from './const';
 
@@ -9,7 +8,6 @@ class Signup extends Component {
     email: '',
     password: '',
     error: null,
-    redirect: null,
   }
 
   componentDidMount() {
@@ -33,26 +31,20 @@ class Signup extends Component {
       email,
       password,
     })
-    console.log(result);
-    if ( result.status === 200 ) {
-      
-      this.setState({
-        redirect: true,
-      })
+    if ( result.status === 200 && result.data.ok === true ) {
+      this.props.history.push('/signin');
     } else {
       this.setState({
         error: result.data.error,
       })
     }
-
   }
 
   render() {
-    const { email, password, error, redirect } = this.state;
+    const { email, password, error } = this.state;
     return (
       <>
       <h1>회원가입</h1>
-      {!!redirect && <Redirect to='/signin' />}
       {!!error && <div style={{color: "red"}}>{error}</div>}
       <form onSubmit={this.onSubmit}>
         <label htmlFor='email'>email</label>
