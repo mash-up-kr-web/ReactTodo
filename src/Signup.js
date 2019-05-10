@@ -1,11 +1,15 @@
-import React, { Component } from 'react';
 import axios from 'axios';
+import React, { Component } from 'react';
+import { Redirect } from 'react-router-dom';
+
 import { url } from './const';
 
 class Signup extends Component {
   state = {
     email: '',
     password: '',
+    error: null,
+    redirect: null,
   }
 
   componentDidMount() {
@@ -22,22 +26,34 @@ class Signup extends Component {
     this.props.history.goBack()
   }
 
-  onSubmit = (e) => {
+  onSubmit = async (e) => {
     const { email, password } = this.state
     e.preventDefault()
-    const result = axios.post(`${url}/users`, {
+    const result = await axios.post(`${url}/users`, {
       email,
       password,
     })
-    console.log('data', email, password)
     console.log(result);
+    if ( result.status === 200 ) {
+      
+      this.setState({
+        redirect: true,
+      })
+    } else {
+      this.setState({
+        error: result.data.error,
+      })
+    }
 
   }
 
   render() {
-    const { email, password } = this.state;
+    const { email, password, error, redirect } = this.state;
     return (
       <>
+      <h1>회원가입</h1>
+      {!!redirect && <Redirect to='/signin' />}
+      {!!error && <div style={{color: "red"}}>{error}</div>}
       <form onSubmit={this.onSubmit}>
         <label htmlFor='email'>email</label>
         <br />
@@ -47,7 +63,7 @@ class Signup extends Component {
         <br />
         <input type="password" name="password" id="password" value={password} onChange={this.onChange} />
         <br />
-        <button type='submit'>로그인</button>
+        <button type='submit'>회원가입</button>
       </form>
       <button onClick={this.goBack}>이전</button>
     </>
